@@ -51,6 +51,13 @@
     .school-note{background:#fff8de;border:1px solid #f1dc92;border-radius:18px;padding:24px;margin-top:24px}
     .buybox{text-align:center;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:34px;box-shadow:var(--shadow)}
     .buybox p{max-width:650px;margin:10px auto}
+    .price{font-size:30px;font-weight:800;color:var(--dark);margin:14px 0 4px}
+    .buy-btn{border:0;cursor:pointer;font-family:inherit;font-size:17px}
+    .small-note{font-size:14px!important;color:var(--muted)!important}
+    #download-panel{display:none;margin-top:22px;padding:22px;background:var(--aqua);border:1px solid #c9e9e6;border-radius:16px}
+    #download-panel.ready{display:block}
+    #download-link{display:none}
+    #payment-status{min-height:24px;margin-top:12px;font-weight:700;color:var(--blue)}
     footer{margin-top:30px;background:var(--dark);color:#fff}
     .footer-inner{max-width:1180px;margin:auto;padding:30px 24px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:14px}
     .footer-inner a{color:#fff;text-decoration:none;margin-left:16px}
@@ -61,6 +68,8 @@
     }
     @media(max-width:620px){.gallery{grid-template-columns:1fr}.steps{grid-template-columns:1fr}}
   </style>
+
+  <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 
   <script type="application/ld+json">
   {
@@ -182,10 +191,19 @@
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="buy">
       <div class="buybox">
-        <h2>Printable PDF</h2>
-        <p>The Water Cycle project contains 12 printable pages and is supplied as a digital PDF. Secure checkout and instant download will be connected next.</p>
+        <h2>Get the Printable Water Cycle Project</h2>
+        <p>The Water Cycle project contains 12 printable pages and is supplied as a digital PDF for printing at home or school.</p>
+        <div class="price">$3.49 USD</div>
+        <p class="small-note">One-time purchase · Secure checkout by Paddle · Instant digital download</p>
+        <button class="btn buy-btn" id="buy-button" type="button">Buy & Download – $3.49</button>
+        <div id="payment-status" aria-live="polite"></div>
+        <div id="download-panel">
+          <h3>Your Water Cycle PDF is ready</h3>
+          <p>Thank you for your purchase. Use the button below to download your printable project.</p>
+          <a class="btn" id="download-link" href="#">Download PDF</a>
+        </div>
       </div>
     </section>
   </main>
@@ -196,5 +214,139 @@
       <div><a href="/">Home</a><a href="/#projects">Projects</a></div>
     </div>
   </footer>
+
+  <script>
+    const PADDLE_CLIENT_TOKEN = "live_6db2475f18adeb16a137f995a0d";
+    const PRICE_ID = "pri_01m1pvvr207xh39rgg8prwnrnb";
+    const CLAIM_URL = "https://school-projects-india-downloads.gedeeldemailbox.workers.dev/claim";
+    const STORAGE_KEY = "spp_water_cycle_transaction";
+    const SUCCESS_URL = "https://schoolprojectsphilippines.com/water-cycle-project.html?payment=success#buy";
+
+    const buyButton = document.getElementById("buy-button");
+    const paymentStatus = document.getElementById("payment-status");
+    const downloadPanel = document.getElementById("download-panel");
+    const downloadLink = document.getElementById("download-link");
+
+    function saveTransactionId(transactionId) {
+      if (typeof transactionId === "string" && transactionId.startsWith("txn_")) {
+        localStorage.setItem(STORAGE_KEY, transactionId);
+        return transactionId;
+      }
+      return null;
+    }
+
+    function getTransactionIdFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return (
+        params.get("_ptxn") ||
+        params.get("transaction_id") ||
+        params.get("transactionId")
+      );
+    }
+
+    function cleanSuccessUrl() {
+      if (window.location.search) {
+        history.replaceState(
+          {},
+          document.title,
+          window.location.pathname + window.location.hash
+        );
+      }
+    }
+
+    async function claimDownload(transactionId, attempt = 1) {
+      if (!transactionId) return;
+
+      paymentStatus.textContent = "Confirming your payment…";
+
+      try {
+        const response = await fetch(CLAIM_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            transaction_id: transactionId
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.status === "ready" && data.download_url) {
+          paymentStatus.textContent = "Payment confirmed.";
+          downloadLink.href = data.download_url;
+          downloadLink.style.display = "inline-block";
+          downloadPanel.classList.add("ready");
+          buyButton.style.display = "none";
+          localStorage.removeItem(STORAGE_KEY);
+          return;
+        }
+
+        if (
+          (response.status === 409 || data.status === "pending") &&
+          attempt < 8
+        ) {
+          paymentStatus.textContent = "Payment received. Preparing your download…";
+          setTimeout(() => claimDownload(transactionId, attempt + 1), 1800);
+          return;
+        }
+
+        paymentStatus.textContent =
+          "Your payment was received, but the download is still being prepared. Please refresh this page in a moment.";
+      } catch (error) {
+        console.error("Claim error:", error);
+        paymentStatus.textContent =
+          "We could not confirm the download yet. Please refresh this page in a moment.";
+      }
+    }
+
+    Paddle.Initialize({
+      token: PADDLE_CLIENT_TOKEN,
+      eventCallback: function(event) {
+        if (
+          event &&
+          event.name === "checkout.completed" &&
+          event.data &&
+          event.data.transaction_id
+        ) {
+          saveTransactionId(event.data.transaction_id);
+        }
+      }
+    });
+
+    buyButton.addEventListener("click", function() {
+      paymentStatus.textContent = "";
+
+      Paddle.Checkout.open({
+        items: [
+          {
+            priceId: PRICE_ID,
+            quantity: 1
+          }
+        ],
+        settings: {
+          displayMode: "overlay",
+          variant: "one-page",
+          theme: "light",
+          locale: "en",
+          successUrl: SUCCESS_URL
+        }
+      });
+    });
+
+    const transactionFromUrl = saveTransactionId(getTransactionIdFromUrl());
+    const storedTransaction = localStorage.getItem(STORAGE_KEY);
+    const shouldRecover =
+      new URLSearchParams(window.location.search).get("payment") === "success" ||
+      transactionFromUrl ||
+      storedTransaction;
+
+    if (shouldRecover && (transactionFromUrl || storedTransaction)) {
+      const transactionId = transactionFromUrl || storedTransaction;
+      cleanSuccessUrl();
+      claimDownload(transactionId);
+    }
+  </script>
+
 </body>
 </html>
