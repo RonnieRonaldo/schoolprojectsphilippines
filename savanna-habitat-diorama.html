@@ -7,6 +7,7 @@
 <meta name="description" content="Create a Savanna Habitat Diorama for kids with printable lions, giraffes, elephants, zebras and savanna scenery. A colorful 3D school project for students in the Philippines.">
 <link rel="canonical" href="https://schoolprojectsphilippines.com/savanna-habitat-diorama.html">
 <meta name="robots" content="index,follow">
+<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <style>
 :root{--b:#174d6b;--d:#10374d;--a:#dff5f3;--c:#fffdf7;--t:#24323a;--m:#63727a;--l:#dce8ea;--shadow:0 12px 30px rgba(20,64,83,.10)}
 *{box-sizing:border-box}
@@ -30,7 +31,10 @@ p{color:var(--m);font-size:17px}
 .stepgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .step{background:#fff;padding:18px;border-radius:15px;text-align:center}
 .single{grid-template-columns:1fr}
-.placeholder{text-align:center}
+.buybox{text-align:center}
+.buy-button,.download-button{display:inline-block;border:0;border-radius:12px;padding:14px 22px;font-size:16px;font-weight:800;background:var(--b);color:#fff;cursor:pointer;text-decoration:none;margin-top:10px}
+.checkout-status{margin-top:16px;font-weight:700;color:var(--d)}
+.download-area{display:none;margin-top:22px;padding:22px;border-radius:16px;background:var(--a);border:1px solid #c9e9e6}
 .footwrap{background:var(--d);color:#fff;margin-top:40px}
 .foot{color:#fff}
 @media(max-width:750px){
@@ -39,18 +43,6 @@ p{color:var(--m);font-size:17px}
   h1{font-size:42px}
 }
 </style>
-<script type="application/ld+json">
-{
-  "@context":"https://schema.org",
-  "@type":"LearningResource",
-  "name":"Savanna Habitat Diorama",
-  "url":"https://schoolprojectsphilippines.com/savanna-habitat-diorama.html",
-  "description":"Printable 3D savanna habitat diorama with African animals and savanna scenery for a school project.",
-  "educationalUse":"School project",
-  "learningResourceType":"Printable habitat diorama",
-  "inLanguage":"en"
-}
-</script>
 </head>
 <body>
 
@@ -162,10 +154,19 @@ p{color:var(--m);font-size:17px}
   </div>
 </section>
 
-<section class="section">
-  <div class="box placeholder">
-    <h2>Printable Savanna Habitat Diorama</h2>
-    <p>The secure digital download will appear here after we connect the checkout.</p>
+<section class="section" id="download">
+  <div class="box buybox">
+    <h2>Want to Make This Savanna Habitat?</h2>
+    <p>Get the printable Savanna Habitat Diorama as an instant digital download. Print the pages at home, cut out the animals and scenery, and build your own 3D savanna school project.</p>
+    <p><strong>Digital PDF · US$3.49 · Secure checkout</strong></p>
+    <button class="buy-button" id="buySavanna">Buy Savanna Habitat Diorama – $3.49</button>
+    <div class="checkout-status" id="checkoutStatus"></div>
+
+    <div class="download-area" id="downloadArea">
+      <h3>Your Savanna Habitat Diorama is Ready</h3>
+      <p>Payment verified. Use the button below to download your PDF.</p>
+      <a class="download-button" id="downloadLink" href="#">Download Savanna Habitat Diorama PDF</a>
+    </div>
   </div>
 </section>
 
@@ -174,6 +175,134 @@ p{color:var(--m);font-size:17px}
 <div class="footwrap">
   <footer class="foot">© 2026 School Projects Philippines · Creative project ideas for students, parents and teachers</footer>
 </div>
+
+<script>
+const PADDLE_CLIENT_TOKEN="live_6db2475f18adeb16a137f995a0d";
+const SAVANNA_PRICE_ID="pri_01m1r7w9c41j014d4e8nwkr533";
+const DOWNLOAD_WORKER="https://school-projects-india-downloads.gedeeldemailbox.workers.dev";
+const STORAGE_KEY="spp_savanna_transaction";
+
+const buyButton=document.getElementById("buySavanna");
+const checkoutStatus=document.getElementById("checkoutStatus");
+const downloadArea=document.getElementById("downloadArea");
+const downloadLink=document.getElementById("downloadLink");
+
+function getTransactionIdFromEvent(event){
+  return event?.data?.transaction_id ||
+         event?.data?.transactionId ||
+         event?.data?.transaction?.id ||
+         (event?.data?.id?.startsWith("txn_") ? event.data.id : null) ||
+         null;
+}
+
+const pageUrl=new URL(window.location.href);
+const returnedTransactionId=
+  pageUrl.searchParams.get("_ptxn") ||
+  pageUrl.searchParams.get("transaction_id") ||
+  pageUrl.searchParams.get("transactionId");
+
+if(returnedTransactionId && returnedTransactionId.startsWith("txn_")){
+  localStorage.setItem(STORAGE_KEY,returnedTransactionId);
+  pageUrl.searchParams.delete("_ptxn");
+  pageUrl.searchParams.delete("transaction_id");
+  pageUrl.searchParams.delete("transactionId");
+  window.history.replaceState({},"",pageUrl.pathname+pageUrl.search+pageUrl.hash);
+}
+
+Paddle.Initialize({
+  token:PADDLE_CLIENT_TOKEN,
+  eventCallback:function(event){
+    const transactionId=getTransactionIdFromEvent(event);
+
+    if(transactionId && transactionId.startsWith("txn_")){
+      localStorage.setItem(STORAGE_KEY,transactionId);
+    }
+
+    if(event.name==="checkout.completed" && transactionId){
+      checkoutStatus.textContent="Payment received. Preparing your secure download...";
+      claimTransaction(transactionId);
+    }
+  }
+});
+
+buyButton.addEventListener("click",function(){
+  checkoutStatus.textContent="";
+
+  Paddle.Checkout.open({
+    items:[
+      {
+        priceId:SAVANNA_PRICE_ID,
+        quantity:1
+      }
+    ],
+    settings:{
+      successUrl:"https://schoolprojectsphilippines.com/savanna-habitat-diorama.html?payment=success#download"
+    }
+  });
+});
+
+async function claimTransaction(transactionId,attempt=1){
+  try{
+    const response=await fetch(DOWNLOAD_WORKER+"/claim",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        transaction_id:transactionId
+      })
+    });
+
+    const data=await response.json();
+
+    if(
+      response.ok &&
+      data.status==="ready" &&
+      data.product==="savanna-ph" &&
+      data.download_url
+    ){
+      downloadLink.href=data.download_url;
+      downloadArea.style.display="block";
+      checkoutStatus.textContent="Payment verified. Your secure PDF is ready.";
+      downloadArea.scrollIntoView({behavior:"smooth",block:"center"});
+      return;
+    }
+
+    if(
+      (response.status===409 || data.status==="pending") &&
+      attempt<120
+    ){
+      checkoutStatus.textContent="Payment is being confirmed. Your download will appear automatically...";
+      setTimeout(function(){
+        claimTransaction(transactionId,attempt+1);
+      },3000);
+      return;
+    }
+
+    checkoutStatus.textContent="We could not verify the payment yet. Please wait a moment and refresh this page.";
+
+  }catch(error){
+    if(attempt<120){
+      setTimeout(function(){
+        claimTransaction(transactionId,attempt+1);
+      },3000);
+    }else{
+      checkoutStatus.textContent="There was a connection problem. Please refresh this page to try again.";
+    }
+  }
+}
+
+const savedTransaction=
+  returnedTransactionId ||
+  localStorage.getItem(STORAGE_KEY);
+
+if(savedTransaction && savedTransaction.startsWith("txn_")){
+  checkoutStatus.textContent="Checking your Savanna Habitat purchase...";
+  claimTransaction(savedTransaction);
+}else if(new URL(window.location.href).searchParams.get("payment")==="success"){
+  checkoutStatus.textContent="Payment completed. Waiting for the secure download information...";
+}
+</script>
 
 </body>
 </html>
