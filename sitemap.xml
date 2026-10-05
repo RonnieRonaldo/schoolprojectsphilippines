@@ -1,14 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
     <loc>https://schoolprojectsphilippines.com/</loc>
-    <lastmod>2026-09-25</lastmod>
+    <lastmod>2026-10-05</lastmod>
   </url>
 
   <url>
     <loc>https://schoolprojectsphilippines.com/water-cycle-project.html</loc>
-    <lastmod>2026-09-05</lastmod>
+    <lastmod>2026-10-05</lastmod>
   </url>
 
   <url>
@@ -50,4 +50,4 @@
 <url><loc>https://schoolprojectsphilippines.com/about.html</loc></url>
 <url><loc>https://schoolprojectsphilippines.com/contact.html</loc></url>
 <url><loc>https://schoolprojectsphilippines.com/horse-farm-diorama.html</loc><lastmod>2026-09-23</lastmod></url>
-</urlset>
+<url><loc>https://schoolprojectsphilippines.com/how-to-make-water-cycle-model.html</loc><lastmod>2026-10-05</lastmod></url></urlset>
