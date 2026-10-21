@@ -41,7 +41,8 @@
 <h1>Rainforest Habitat Diorama for Kids</h1>
 <p>Create a colorful 3D tropical rainforest filled with lush plants and rainforest animals. Students print, cut and assemble the pieces to build their own habitat diorama.</p>
 <p>A hands-on school project for exploring rainforest habitats, animals and ecosystems while making something children can proudly present in class.</p>
-<a class="btn" href="#project-details">See the Project</a>
+<button type="button" class="buy-button" id="buyRainforestTop">Buy Rainforest Habitat Diorama – $3.49</button>
+<p><a href="#project-details">See the project details</a> · <a href="#project-video">Watch the video</a></p>
 </div>
 <div><img alt="Completed rainforest habitat diorama with tropical forest scenery, orangutan, sloths, toucan, anteater and other rainforest animals" src="images/rainforest-habitat-diorama-project-philippines-1280.webp" srcset="images/rainforest-habitat-diorama-project-philippines-640.webp 640w, images/rainforest-habitat-diorama-project-philippines-1280.webp 1280w" sizes="(max-width: 700px) 100vw, 800px" width="1280" height="1278" decoding="async" loading="eager" fetchpriority="high"></div>
 </section>
@@ -80,6 +81,12 @@
 <figure><img alt="Completed rainforest habitat diorama with toucan, orangutan, sloths, anteater and other animals arranged in tropical scenery" src="images/rainforest-habitat-diorama-animals-philippines-1280.webp" srcset="images/rainforest-habitat-diorama-animals-philippines-640.webp 640w, images/rainforest-habitat-diorama-animals-philippines-1280.webp 1280w" sizes="(max-width: 700px) 100vw, 800px" width="1280" height="1278" decoding="async" loading="lazy"><figcaption>Students can arrange the animals around the rainforest to create their own scene.</figcaption></figure>
 </div>
 </section>
+
+<section class="section" id="project-video"><div class="box">
+<h2>Watch the Rainforest Diorama Video</h2>
+<p>Take a closer look at the rainforest habitat diorama in this short video.</p>
+<a class="btn" href="https://www.youtube.com/shorts/WSnH-HX8DQE" target="_blank" rel="noopener noreferrer">Watch the Rainforest Diorama on YouTube</a>
+</div></section>
 
 <section class="steps-wrap" id="how-it-works"><div class="section">
 <h2>Print, Cut, Build & Learn</h2>
@@ -155,7 +162,7 @@ Paddle.Initialize({
   }
 });
 
-buyButton.addEventListener("click",function(){
+function openRainforestCheckout(){
   checkoutStatus.textContent="";
   Paddle.Checkout.open({
     items:[{priceId:RAINFOREST_PRICE_ID,quantity:1}],
@@ -163,7 +170,9 @@ buyButton.addEventListener("click",function(){
       successUrl:"https://schoolprojectsphilippines.com/rainforest-habitat-diorama.html?payment=success#download"
     }
   });
-});
+}
+buyButton.addEventListener("click",openRainforestCheckout);
+document.getElementById("buyRainforestTop").addEventListener("click",openRainforestCheckout);
 
 async function claimTransaction(transactionId,attempt=1){
   try{
