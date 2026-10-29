@@ -48,7 +48,15 @@ header{background:#fff;border-bottom:1px solid #eee4d4;padding:20px;text-align:c
 <footer>© 2026 School Projects Philippines · Creative project ideas for students, parents and teachers
 <div class="legal-links"><a href="/#projects">Projects & Pricing</a> · <a href="/contact.html">Contact & Help</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="/refund-policy.html">Refunds</a></div><div style="max-width:1180px;margin:auto;padding:0 24px 24px;text-align:center"><a href="/faq.html" style="color:inherit;display:inline-block;margin:6px 10px">FAQ</a><a href="/about.html" style="color:inherit;display:inline-block;margin:6px 10px">About Me</a></div><div class="analytics-footer"><a href="/privacy.html">Privacy &amp; analytics</a> · <button type="button" class="analytics-settings">Analytics settings</button></div></footer>
 
-<div class="sticky-buy"><div><strong>PDF</strong><small>Instant digital download</small></div><button class="buy-button" data-position="sticky">Buy Volcano PDF</button></div><script>
+<div class="sticky-buy"><div><strong>PDF</strong><small>Instant digital download</small></div><button class="buy-button" data-position="sticky">Buy Volcano PDF</button></div><script>(function(){
+const u=new URL(location.href);const id=u.searchParams.get('_ptxn');
+if(/^txn_[a-z0-9]{10,80}$/.test(id||'')){
+ sessionStorage.setItem('ph_recovery_resume',id);
+ u.searchParams.delete('_ptxn');history.replaceState({},'',u.pathname+u.search+u.hash);
+}
+if(!u.searchParams.has('payment')){try{localStorage.removeItem("spi_volcano_ph_transaction")}catch(e){}}
+})();</script>
+<script>
 const PRICE_ID="pri_01m2a82knepe8754debdk7cahq";
 const WORKER="https://school-projects-india-downloads.gedeeldemailbox.workers.dev";
 const STORAGE_KEY="spi_volcano_ph_transaction";
@@ -100,11 +108,11 @@ if(window.Paddle){
   }
  }});
  buttons.forEach(button=>button.addEventListener('click',()=>{
-  if(paid||checking||transactionId){showStatus();return;}
+  if(paid||checking){showStatus();return;}
   if(typeof gtag==='function')gtag('event','buy_click',{product:'volcano-ph',position:button.dataset.position});
   try{Paddle.Checkout.open({items:[{priceId:PRICE_ID,quantity:1}],settings:{successUrl:'https://schoolprojectsphilippines.com/volcano-school-project-ph.html?payment=success#download'}});}catch(e){status('Checkout could not open. Please refresh the page and try again.');showStatus();}
  }));
 }else{lock(true);status('Checkout could not load. Please refresh the page to try again.');}
-if(transactionId){claim();}
+if(transactionId && pageUrl.searchParams.get("payment")==="success"){claim();}
 else if(pageUrl.searchParams.get('payment')==='success'){paid=true;lock(true);status('If you completed payment, please contact us with your Paddle receipt so we can help retrieve your download. Please do not purchase again.');}
-</script></body></html>
+</script><script src="/philippines-recovery.js" data-product="volcano-ph" data-storage-key="spi_volcano_ph_transaction" data-original-button=""></script></body></html>

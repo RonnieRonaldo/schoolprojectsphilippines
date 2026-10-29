@@ -96,7 +96,7 @@
 <link rel="stylesheet" href="/analytics-consent.css">
 <script defer src="/analytics-consent.js"></script>
 <style>img { max-width: 100%; height: auto; }</style>
-</head>
+<style>.ph-extra-cta{text-align:center;max-width:850px;margin:26px auto;padding:20px;border:1px solid #d9e5ec;background:#f4f9fc;border-radius:12px}.ph-extra-cta p{margin:0 0 12px}.ph-extra-cta button{background:#145a86;color:white;border:0;border-radius:10px;padding:14px 24px;font-weight:700;cursor:pointer}</style></head>
 
 <body>
   <div class="topbar">Printable school projects made easier for families, students and teachers</div>
@@ -124,7 +124,7 @@
       <div>
         <img alt="Completed printable Water Cycle Project and 3D science model for students in the Philippines" src="images/water-cycle-project-philippines-1280.webp" srcset="images/water-cycle-project-philippines-640.webp 640w, images/water-cycle-project-philippines-1280.webp 1280w" sizes="(max-width: 700px) 100vw, 800px" width="1280" height="1280" decoding="async" loading="eager" fetchpriority="high">
       </div>
-    </section>
+    </section><div class="ph-extra-cta"><p>Printable PDF · Secure checkout · Instant digital download</p><button type="button" data-ph-buy-proxy>Buy &amp; Download PDF</button></div>
 
     <section class="section" id="project-details">
       <div class="box">
@@ -174,7 +174,7 @@
           <div class="step"><strong>4. Explain</strong>Use the finished model to describe the cycle.</div>
         </div>
       </div>
-    </section>
+    </section><div class="ph-extra-cta"><p>Printable PDF · Secure checkout · Instant digital download</p><button type="button" data-ph-buy-proxy>Buy &amp; Download PDF</button></div>
 
     <section class="section examples">
       <h2>See How Students Made It Their Own</h2>
@@ -228,7 +228,15 @@
     </div>
   <div style="max-width:1180px;margin:auto;padding:0 24px 24px;text-align:center"><a href="/faq.html" style="color:inherit;display:inline-block;margin:6px 10px">FAQ</a><a href="/about.html" style="color:inherit;display:inline-block;margin:6px 10px">About Me</a><a href="/contact.html" style="color:inherit;display:inline-block;margin:6px 10px">Contact &amp; Help</a></div><div class="analytics-footer"><a href="/privacy.html">Privacy &amp; analytics</a> · <button type="button" class="analytics-settings">Analytics settings</button></div></footer>
 
-  <script>
+  <script>(function(){
+const u=new URL(location.href);const id=u.searchParams.get('_ptxn');
+if(/^txn_[a-z0-9]{10,80}$/.test(id||'')){
+ sessionStorage.setItem('ph_recovery_resume',id);
+ u.searchParams.delete('_ptxn');history.replaceState({},'',u.pathname+u.search+u.hash);
+}
+if(!u.searchParams.has('payment')){try{localStorage.removeItem("spp_water_cycle_transaction")}catch(e){}}
+})();</script>
+<script>
     const PADDLE_CLIENT_TOKEN = "live_6db2475f18adeb16a137f995a0d";
     const PRICE_ID = "pri_01m1pvvr207xh39rgg8prwnrnb";
     const CLAIM_URL = "https://school-projects-india-downloads.gedeeldemailbox.workers.dev/claim";
@@ -359,7 +367,7 @@
       cleanSuccessUrl();
       claimDownload(transactionId);
     }
-  </script>
+  </script><script src="/philippines-recovery.js" data-product="water-cycle-ph" data-storage-key="spp_water_cycle_transaction" data-original-button="buy-button"></script>
 
 </body>
 </html>

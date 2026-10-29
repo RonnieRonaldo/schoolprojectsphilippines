@@ -167,6 +167,14 @@ body{padding-bottom:90px}
 <button type="button" class="btn buy-button" data-position="sticky">Buy PDF — US$3.49</button>
 </div>
 
+<script>(function(){
+const u=new URL(location.href);const id=u.searchParams.get('_ptxn');
+if(/^txn_[a-z0-9]{10,80}$/.test(id||'')){
+ sessionStorage.setItem('ph_recovery_resume',id);
+ u.searchParams.delete('_ptxn');history.replaceState({},'',u.pathname+u.search+u.hash);
+}
+if(!u.searchParams.has('payment')){try{localStorage.removeItem("spp_horse_stable_transaction")}catch(e){}}
+})();</script>
 <script>
 const PRICE_ID="pri_01m36r0g0j9rvz4yq7z0qwg632";
 const PRODUCT="horse-stable-ph";
@@ -402,7 +410,7 @@ lock(true);
 
 status("If you completed payment, please contact us with your Paddle receipt so we can help retrieve your download. Please do not purchase again.");
 }
-</script>
+</script><script src="/philippines-recovery.js" data-product="horse-stable-ph" data-storage-key="spp_horse_stable_transaction" data-original-button=""></script>
 
 </body>
 </html>
